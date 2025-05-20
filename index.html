@@ -17,13 +17,13 @@
         </svg>
       </button>
       <div id="menu" class="hidden sm:flex sm:items-center sm:space-x-4">
-        <a href="#games" class="block px-4 py-2 text-lg hover:text-blue-400 sm:inline">Oyunlar</a>
-        <a href="#login" class="block px-4 py-2 text-lg hover:text-blue-400 sm:inline">Giriş Yap</a>
-        <a href="#register" class="block px-4 py-2 text-lg hover:text-blue-400 sm:inline">Kayıt Ol</a>
+        <a href="#games" class="px-4 py-2 text-lg hover:text-blue-400">Oyunlar</a>
+        <a href="#login" class="px-4 py-2 text-lg hover:text-blue-400">Giriş Yap</a>
+        <a href="#register" class="px-4 py-2 text-lg hover:text-blue-400">Kayıt Ol</a>
       </div>
     </div>
     <!-- Mobil Menü -->
-    <div id="mobile-menu" class="hidden sm:hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-50">
+    <div id="mobile-menu" class="hidden sm:hidden fixed inset-0 bg-gray-900 bg-opacity-95 z-50 transform transition-transform duration-300 translate-x-full">
       <div class="flex justify-end p-4">
         <button id="menu-close" class="text-white focus:outline-none">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -31,8 +31,13 @@
           </svg>
         </button>
       </div>
-      <div class="flex flex-col items-center justify-center h-full space-y-6">
+      <div class="flex flex-col items-center justify-center h-full space-y-8">
         <a href="#games" class="text-2xl font-semibold hover:text-blue-400">Oyunlar</a>
+        <div class="flex flex-col items-center space-y-4">
+          <a href="#slot-oyunlari" class="text-xl hover:text-blue-400">Slot Oyunları</a>
+          <a href="#canli-casino" class="text-xl hover:text-blue-400">Canlı Casino</a>
+          <a href="#spor-bahisleri" class="text-xl hover:text-blue-400">Spor Bahisleri</a>
+        </div>
         <a href="#login" class="text-2xl font-semibold hover:text-blue-400">Giriş Yap</a>
         <a href="#register" class="text-2xl font-semibold hover:text-blue-400">Kayıt Ol</a>
       </div>
@@ -40,44 +45,44 @@
   </nav>
 
   <!-- Hero Section -->
-  <section class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 sm:p-10 text-center pt-20 sm:pt-10">
-    <h2 class="text-2xl sm:text-4xl font-bold mb-4">Eğlenceye Dal!</h2>
-    <p class="text-base sm:text-lg mb-6">Favori oyunlarını keşfet ve heyecanı yaşa!</p>
-    <button class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 sm:px-6 rounded text-sm sm:text-base">
+  <section class="bg-gradient-to-r from-blue-700 to-purple-700 p-6 sm:p-10 text-center pt-20">
+    <h2 class="text-3xl sm:text-5xl font-extrabold mb-4 tracking-tight">Heyecanı Yakala!</h2>
+    <p class="text-base sm:text-xl mb-6">En popüler oyunlarla kazanmaya başla!</p>
+    <button class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded-lg text-base sm:text-lg transition duration-300">
       Şimdi Oyna
     </button>
   </section>
 
   <!-- Oyunlar Section -->
   <section id="games" class="container mx-auto py-6 sm:py-10">
-    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6">İlk Oyunlarımız</h2>
+    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6">Oyun Kategorileri</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-      <div class="bg-gray-800 p-4 rounded-lg text-center">
-        <h3 class="text-lg sm:text-xl font-semibold">Slot Oyunları</h3>
-        <p class="text-sm sm:text-base">Eğlenceli slot makineleri ve popüler Aviator oyunu.</p>
-        <button id="play-aviator" class="mt-4 bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base">Oyna</button>
+      <div id="slot-oyunlari" class="bg-gray-800 p-4 rounded-lg text-center shadow-lg hover:shadow-xl transition duration-300">
+        <h3 class="text-lg sm:text-xl font-semibold mb-2">Slot Oyunları</h3>
+        <p class="text-sm sm:text-base mb-4">Eğlenceli slot makineleri ve popüler Aviator oyunu.</p>
+        <button id="play-aviator" class="bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base font-medium">Oyna</button>
       </div>
-      <div class="bg-gray-800 p-4 rounded-lg text-center">
-        <h3 class="text-lg sm:text-xl font-semibold">Canlı Casino</h3>
-        <p class="text-sm sm:text-base">Gerçek krupiyelerle rulet, blackjack ve baccarat.</p>
-        <button class="mt-4 bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base">Oyna</button>
+      <div id="canli-casino" class="bg-gray-800 p-4 rounded-lg text-center shadow-lg hover:shadow-xl transition duration-300">
+        <h3 class="text-lg sm:text-xl font-semibold mb-2">Canlı Casino</h3>
+        <p class="text-sm sm:text-base mb-4">Gerçek krupiyelerle rulet, blackjack ve baccarat.</p>
+        <button class="bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base font-medium">Oyna</button>
       </div>
-      <div class="bg-gray-800 p-4 rounded-lg text-center">
-        <h3 class="text-lg sm:text-xl font-semibold">Spor Bahisleri</h3>
-        <p class="text-sm sm:text-base">Futbol, basketbol ve daha fazla spor dalına bahis.</p>
-        <button class="mt-4 bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base">Oyna</button>
+      <div id="spor-bahisleri" class="bg-gray-800 p-4 rounded-lg text-center shadow-lg hover:shadow-xl transition duration-300">
+        <h3 class="text-lg sm:text-xl font-semibold mb-2">Spor Bahisleri</h3>
+        <p class="text-sm sm:text-base mb-4">Futbol, basketbol ve daha fazla spor dalına bahis.</p>
+        <button class="bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base font-medium">Oyna</button>
       </div>
     </div>
   </section>
 
   <!-- Aviator Oyunu Modal -->
-  <div id="aviator-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+  <div id="aviator-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-gray-800 p-4 sm:p-6 rounded-lg w-11/12 sm:w-full max-w-md">
       <h2 class="text-xl sm:text-2xl font-bold mb-4">Aviator Oyunu</h2>
       <canvas id="aviator-canvas" class="bg-gray-900 mb-4 w-full" style="height: 150px;"></canvas>
       <p id="multiplier" class="text-base sm:text-lg mb-4">Çarpan: 1.00x</p>
-      <button id="cashout-button" class="bg-green-500 hover:bg-green-600 py-2 px-4 rounded mr-2 text-sm sm:text-base">Çıkış Yap</button>
-      <button id="close-modal" class="bg-red-500 hover:bg-red-600 py-2 px-4 rounded text-sm sm:text-base">Kapat</button>
+      <button id="cashout-button" class="bg-green-500 hover:bg-green-600 py-2 px-4 rounded mr-2 text-sm sm:text-base font-medium">Çıkış Yap</button>
+      <button id="close-modal" class="bg-red-500 hover:bg-red-600 py-2 px-4 rounded text-sm sm:text-base font-medium">Kapat</button>
     </div>
   </div>
 
@@ -94,12 +99,14 @@
     const menu = document.getElementById('menu');
 
     menuToggle.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      menu.classList.add('hidden'); // Masaüstü menüyü gizle
+      mobileMenu.classList.remove('hidden', 'translate-x-full');
+      mobileMenu.classList.add('translate-x-0');
+      menu.classList.add('hidden');
     });
 
     menuClose.addEventListener('click', () => {
-      mobileMenu.classList.add('hidden');
+      mobileMenu.classList.add('hidden', 'translate-x-full');
+      mobileMenu.classList.remove('translate-x-0');
     });
 
     // Aviator Oyunu Mantığı
