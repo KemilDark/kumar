@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Kumar Sitesi</title>
+  <link href="./css/styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+  <!-- Navbar -->
+  <nav class="bg-gray-800 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-xl sm:text-2xl font-bold">Demo Kumar Sitesi</h1>
+      <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <div id="menu" class="hidden sm:flex sm:items-center sm:space-x-4">
+        <a href="#games" class="block px-4 py-2 hover:text-blue-400 sm:inline">Oyunlar</a>
+        <a href="#login" class="block px-4 py-2 hover:text-blue-400 sm:inline">Giriş Yap</a>
+        <a href="#register" class="block px-4 py-2 hover:text-blue-400 sm:inline">Kayıt Ol</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 sm:p-10 text-center">
+    <h2 class="text-2xl sm:text-4xl font-bold mb-4">Eğlenceye Dal!</h2>
+    <p class="text-base sm:text-lg mb-6">Favori oyunlarını keşfet ve heyecanı yaşa!</p>
+    <button class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 sm:px-6 rounded text-sm sm:text-base">
+      Şimdi Oyna
+    </button>
+  </section>
+
+  <!-- Oyunlar Section -->
+  <section id="games" class="container mx-auto py-6 sm:py-10">
+    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6">İlk Oyunlarımız</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+      <div class="bg-gray-800 p-4 rounded-lg text-center">
+        <h3 class="text-lg sm:text-xl font-semibold">Slot Oyunları</h3>
+        <p class="text-sm sm:text-base">Eğlenceli slot makineleri ve popüler Aviator oyunu.</p>
+        <button id="play-aviator" class="mt-4 bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base">Oyna</button>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-lg text-center">
+        <h3 class="text-lg sm:text-xl font-semibold">Canlı Casino</h3>
+        <p class="text-sm sm:text-base">Gerçek krupiyelerle rulet, blackjack ve baccarat.</p>
+        <button class="mt-4 bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base">Oyna</button>
+      </div>
+      <div class="bg-gray-800 p-4 rounded-lg text-center">
+        <h3 class="text-lg sm:text-xl font-semibold">Spor Bahisleri</h3>
+        <p class="text-sm sm:text-base">Futbol, basketbol ve daha fazla spor dalına bahis.</p>
+        <button class="mt-4 bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded text-sm sm:text-base">Oyna</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Aviator Oyunu Modal -->
+  <div id="aviator-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-gray-800 p-4 sm:p-6 rounded-lg w-11/12 sm:w-full max-w-md">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4">Aviator Oyunu</h2>
+      <canvas id="aviator-canvas" class="bg-gray-900 mb-4 w-full" style="height: 150px;"></canvas>
+      <p id="multiplier" class="text-base sm:text-lg mb-4">Çarpan: 1.00x</p>
+      <button id="cashout-button" class="bg-green-500 hover:bg-green-600 py-2 px-4 rounded mr-2 text-sm sm:text-base">Çıkış Yap</button>
+      <button id="close-modal" class="bg-red-500 hover:bg-red-600 py-2 px-4 rounded text-sm sm:text-base">Kapat</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 p-4 text-center">
+    <p class="text-sm sm:text-base">© 2025 Demo Kumar Sitesi. Tüm hakları saklıdır. (Bu yalnızca bir eğitim demosudur)</p>
+  </footer>
+
+  <script>
+    // Hamburger Menü
+    const menuToggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('menu');
+    menuToggle.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+
+    // Aviator Oyunu Mantığı
+    const playAviatorButton = document.getElementById('play-aviator');
+    const aviatorModal = document.getElementById('aviator-modal');
+    const closeModalButton = document.getElementById('close-modal');
+    const cashoutButton = document.getElementById('cashout-button');
+    const multiplierDisplay = document.getElementById('multiplier');
+    const canvas = document.getElementById('aviator-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Canvas boyutlarını dinamik yap
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.offsetWidth - 32; // Padding'i çıkar
+      canvas.height = window.innerWidth < 640 ? 150 : 200; // Mobil için daha küçük
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    let multiplier = 1.00;
+    let isPlaying = false;
+    let animationFrame;
+
+    function startGame() {
+      multiplier = 1.00;
+      isPlaying = true;
+      cashoutButton.disabled = false;
+      multiplierDisplay.textContent = `Çarpan: ${multiplier.toFixed(2)}x`;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let time = 0;
+      function animate() {
+        if (!isPlaying) return;
+        time += 0.05;
+        multiplier = 1 + time * 0.5; // Yavaş çarpan artışı
+        multiplierDisplay.textContent = `Çarpan: ${multiplier.toFixed(2)}x`;
+
+        // Basit grafik
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height);
+        ctx.lineTo(time * 40, canvas.height - (multiplier - 1) * 50);
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Rastgele çarpma noktası
+        if (Math.random() < 0.03 || multiplier > 5) {
+          isPlaying = false;
+          cashoutButton.disabled = true;
+          alert(`Oyun bitti! Çarpan: ${multiplier.toFixed(2)}x`);
+          return;
+        }
+
+        animationFrame = requestAnimationFrame(animate);
+      }
+
+      animationFrame = requestAnimationFrame(animate);
+    }
+
+    playAviatorButton.addEventListener('click', () => {
+      aviatorModal.classList.remove('hidden');
+      startGame();
+    });
+
+    closeModalButton.addEventListener('click', () => {
+      aviatorModal.classList.add('hidden');
+      isPlaying = false;
+      cancelAnimationFrame(animationFrame);
+    });
+
+    cashoutButton.addEventListener('click', () => {
+      if (isPlaying) {
+        isPlaying = false;
+        cancelAnimationFrame(animationFrame);
+        alert(`Çıkış yaptın! Kazanılan çarpan: ${multiplier.toFixed(2)}x`);
+      }
+    });
+
+    // Diğer butonlar için alert
+    document.querySelectorAll('.bg-blue-500:not(#play-aviator)').forEach(button => {
+      button.addEventListener('click', () => {
+        alert('Bu bir demo butonudur! Gerçek bir oyun başlatmaz.');
+      });
+    });
+  </script>
+</body>
+</html>
