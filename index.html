@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aviator, Şans Çarkı, Zar Atma, Balon, Slot, Penaltı ve Tombala Oyunu</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #ffffff;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #0a1a2f;
+      padding: 15px 25px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .categories-button, .logout-button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background: #00d4ff;
+      color: #0a1a2f;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .categories-button:hover, .logout-button:hover {
+      background: #00a3cc;
+    }
+
+    .logout-button.hidden {
+      display: none;
+    }
+
+    #categories {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 25px;
+      background: #fff;
+      border: 1px solid #0a1a2f;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    #categories button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 16px;
+      color: #0a1a2f;
+      cursor: pointer;
+    }
+
+    #categories button:hover {
+      background: #00d4ff;
+      color: #fff;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h1, h2, h3 {
+      color: #0a1a2f;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #2e7d32;
+    }
+
+    input {
+      padding: 12px;
+      margin: 10px 0;
+      width: 100%;
+      border: 1px solid #0a1a2f;
+      border-radius: 5px;
+      font-size: 16px;
+      background: #ffffff;
+      color: #333;
+    }
+
+    input::placeholder {
+      color: #666;
+    }
+
+    button {
+      padding: 12px;
+      margin: 10px 0;
+      width: 100%;
+      background: #00d4ff;
+      color: #0a1a2f;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #00a3cc;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .auth-buttons button {
+      width: auto;
+      min-width: 100px;
+    }
+
+    #result, #userInfo, #balance {
+      margin: 10px 0;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    #gameArea, #wheelArea, #diceArea, #balloonArea, #slotArea, #penaltyArea, #bingoArea {
+      display: none;
+      position: relative;
+      height: 300px;
+      background: #0a1a2f;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #gameArea.active, #wheelArea.active, #diceArea.active, #balloonArea.active, #slotArea.active, #penaltyArea.active, #bingoArea.active {
+      display: flex;
+    }
+
+    #plane {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 40px;
+      transition: transform 0.1s ease;
+    }
+
+    #wheel {
+      width: 200px;
+      height: 200px;
+      background: conic-gradient(
+        #ff6f61 0deg 72deg,
+        #00d4ff 72deg 144deg,
+        #2e7d32 144deg 216deg,
+        #d32f2f 216deg 288deg,
+        #fbc02d 288deg 360deg
+      );
+      border-radius: 50%;
+      position: relative;
+      transition: transform 3s ease-out;
+    }
+
+    #wheel::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 20px solid #fff;
+    }
+
+    #wheel.spinning {
+      transform: rotate(1080deg);
+    }
+
+    #dice {
+      display: flex;
+      gap: 20px;
+      font-size: 60px;
+      color: #fff;
+    }
+
+    .die {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      color: #0a1a2f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.5s ease;
+    }
+
+    .die.rolling {
+      transform: rotate(360deg);
+    }
+
+    #balloon {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 60px;
+      transition: transform 0.1s ease;
+    }
+
+    #balloon.popped {
+      font-size: 80px;
+      transform: translateX(-50%) scale(1.5);
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    #slotMachine {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .reel {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      color: #0a1a2f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.5s ease;
+    }
+
+    .reel.spinning {
+      transform: rotateX(360deg);
+    }
+
+    #penaltyScene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #goal {
+      position: absolute;
+      top: 10px;
+      width: 200px;
+      height: 100px;
+      background: #fff;
+      border: 5px solid #000;
+      border-radius: 10px;
+    }
+
+    #ball {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 40px;
+      transition: transform 0.5s ease;
+    }
+
+    #ball.shooting {
+      transform: translateX(-50%) translateY(-200px);
+    }
+
+    #ball.missed {
+      transform: translateX(-50%) translateY(-250px);
+      opacity: 0;
+    }
+
+    #bingoArea {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #bingoCard {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    .bingo-cell {
+      width: 50px;
+      height: 50px;
+      background: #fff;
+      color: #0a1a2f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease;
+    }
+
+    .bingo-cell.marked {
+      background: #00d4ff;
+      color: #fff;
+    }
+
+    #bingoDrawnNumbers {
+      font-size: 16px;
+      color: #00d4ff;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #bingoResult, #multiplier, #wheelResult, #diceResult, #balloonMultiplier, #slotResult, #penaltyResult {
+      font-size: 24px;
+      color: #00d4ff;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 10px 15px;
+      }
+
+      main {
+        margin: 15px;
+        padding: 15px;
+      }
+
+      .auth-buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      #categories {
+        top: 50px;
+        left: 15px;
+        width: 150px;
+      }
+
+      #dice {
+        font-size: 40px;
+      }
+
+      .die {
+        width: 60px;
+        height: 60px;
+      }
+
+      .reel {
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+      }
+
+      #balloon {
+        font-size: 40px;
+      }
+
+      #balloon.popped {
+        font-size: 60px;
+      }
+
+      #goal {
+        width: 150px;
+        height: 75px;
+      }
+
+      #ball {
+        font-size: 30px;
+      }
+
+      #ball.shooting {
+        transform: translateX(-50%) translateY(-150px);
+      }
+
+      #ball.missed {
+        transform: translateX(-50%) translateY(-180px);
+      }
+
+      #bingoCard {
+        grid-template-columns: repeat(5, 40px);
+      }
+
+      .bingo-cell {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="categories-button" onclick="showCategories()">Kategoriler</button>
+  <button class="logout-button hidden" onclick="logout()">Çıkış Yap</button>
+  <div id="categories">
+    <button onclick="showGame('aviator')">Aviator Oyunu</button>
+    <button onclick="showGame('wheel')">Şans Çarkı</button>
+    <button onclick="showGame('dice')">Zar Atma</button>
+    <button onclick="showGame('balloon')">Balon Oyunu</button>
+    <button onclick="showGame('slot')">Slot Oyunu</button>
+    <button onclick="showGame('penalty')">Penaltı Oyunu</button>
+    <button onclick="showGame('bingo')">Tombala Oyunu</button>
+  </div>
+</header>
+
+<main>
+  <h1>Bol Şanslar!</h1>
+
+  <div id="gameArea">
+    <div id="plane">✈️</div>
+  </div>
+  <div id="multiplier" style="display: none;">Çarpan: 1.00x</div>
+  <input type="number" id="betAmount" placeholder="Bahis miktarı (Min 2 TL)" min="2" step="0.01" required style="display: none;">
+  <button onclick="startGame()" id="betButton" style="display: none;">Bahis Yap</button>
+  <button onclick="cashOut()" id="cashOutBtn" disabled style="display: none;">Nakit Çek</button>
+
+  <div id="wheelArea">
+    <div id="wheel"></div>
+  </div>
+  <div id="wheelResult" style="display: none;">Çarkı çevirmek için 5 TL bahis yap!</div>
+  <button onclick="startWheel()" id="wheelButton" style="display: none;">Çarkı Çevir (5 TL)</button>
+
+  <div id="diceArea">
+    <div id="dice">
+      <div class="die" id="die1">1</div>
+      <div class="die" id="die2">1</div>
+    </div>
+  </div>
+  <div id="diceResult" style="display: none;">Zarları atmak için 5 TL bahis yap!</div>
+  <button onclick="rollDice()" id="diceButton" style="display: none;">Zar At (5 TL)</button>
+
+  <div id="balloonArea">
+    <div id="balloon">🎈</div>
+  </div>
+  <div id="balloonMultiplier" style="display: none;">Çarpan: 1.00x</div>
+  <input type="number" id="balloonBetAmount" placeholder="Bahis miktarı (Min 2 TL)" min="2" step="0.01" required style="display: none;">
+  <button onclick="startBalloonGame()" id="balloonBetButton" style="display: none;">Bahis Yap</button>
+  <button onclick="cashOutBalloon()" id="balloonCashOutBtn" disabled style="display: none;">Nakit Çek</button>
+
+  <div id="slotArea">
+    <div id="slotMachine">
+      <div class="reel" id="reel1">🍒</div>
+      <div class="reel" id="reel2">🍒</div>
+      <div class="reel" id="reel3">🍒</div>
+    </div>
+  </div>
+  <div id="slotResult" style="display: none;">Slotu çevirmek için 5 TL bahis yap!</div>
+  <button onclick="spinSlot()" id="slotButton" style="display: none;">Slot Çevir (5 TL)</button>
+
+  <div id="penaltyArea">
+    <div id="penaltyScene">
+      <div id="goal"></div>
+      <div id="ball">⚽</div>
+    </div>
+  </div>
+  <div id="penaltyResult" style="display: none;">Penaltıyı atmak için 5 TL bahis yap!</div>
+  <button onclick="shootPenalty()" id="penaltyButton" style="display: none;">Penaltı At (5 TL)</button>
+
+  <div id="bingoArea">
+    <div id="bingoDrawnNumbers"></div>
+    <div id="bingoCard"></div>
+  </div>
+  <div id="bingoResult" style="display: none;">Numara çekmek için 5 TL bahis yap!</div>
+  <button onclick="playBingo()" id="bingoButton" style="display: none;">Numara Çek (5 TL)</button>
+
+  <div id="authForm">
+    <h3>Giriş Bilgileri</h3>
+    <input type="email" id="email" placeholder="Email adresinizi girin" required>
+    <input type="password" id="password" placeholder="Şifrenizi girin" required>
+    <div class="auth-buttons" id="authButtons"></div>
+  </div>
+
+  <p id="userInfo">Henüz giriş yapılmadı.</p>
+  <p>Bakiye: <span id="balance">0</span> TL</p>
+
+  <h3>Kod Gir</h3>
+  <input type="text" id="codeInput" placeholder="Kodu buraya girin" required>
+  <button onclick="useCode()">Kodu Kullan</button>
+  <p id="result"></p>
+</main>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getDatabase, ref, onValue, set, get } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAB0OSTvI3Ph8aBUbRqnGAWEuvod3WpbK0",
+    authDomain: "kumar-67047.firebaseapp.com",
+    databaseURL: "https://kumar-67047-default-rtdb.firebaseio.com",
+    projectId: "kumar-67047",
+    storageBucket: "kumar-67047.firebasestorage.app",
+    messagingSenderId: "640793244872",
+    appId: "1:640793244872:web:eea7f651d17ce77a0ba1fd",
+    measurementId: "G-9XW5DSMPEN"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  let currentUser = null;
+  let gameInterval = null;
+  let currentMultiplier = 1;
+  let gameRunning = false;
+  let wheelSpinning = false;
+  let diceRolling = false;
+  let balloonGameRunning = false;
+  let balloonInterval = null;
+  let currentBalloonMultiplier = 1;
+  let slotSpinning = false;
+  let penaltyShooting = false;
+  let bingoPlaying = false;
+  let bingoNumbers = [];
+  let bingoCard = [];
+
+  const riseSound = new Audio('rise.mp3');
+  const popSound = new Audio('pop.mp3');
+  riseSound.loop = true;
+
+  window.showCategories = function() {
+    const categories = document.getElementById("categories");
+    categories.style.display = categories.style.display === "block" ? "none" : "block";
+  };
+
+  window.showGame = function(game) {
+    const gameArea = document.getElementById("gameArea");
+    const wheelArea = document.getElementById("wheelArea");
+    const diceArea = document.getElementById("diceArea");
+    const balloonArea = document.getElementById("balloonArea");
+    const slotArea = document.getElementById("slotArea");
+    const penaltyArea = document.getElementById("penaltyArea");
+    const bingoArea = document.getElementById("bingoArea");
+    const multiplier = document.getElementById("multiplier");
+    const betAmount = document.getElementById("betAmount");
+    const betButton = document.getElementById("betButton");
+    const cashOutBtn = document.getElementById("cashOutBtn");
+    const wheelResult = document.getElementById("wheelResult");
+    const wheelButton = document.getElementById("wheelButton");
+    const diceResult = document.getElementById("diceResult");
+    const diceButton = document.getElementById("diceButton");
+    const balloonMultiplier = document.getElementById("balloonMultiplier");
+    const balloonBetAmount = document.getElementById("balloonBetAmount");
+    const balloonBetButton = document.getElementById("balloonBetButton");
+    const balloonCashOutBtn = document.getElementById("balloonCashOutBtn");
+    const slotResult = document.getElementById("slotResult");
+    const slotButton = document.getElementById("slotButton");
+    const penaltyResult = document.getElementById("penaltyResult");
+    const penaltyButton = document.getElementById("penaltyButton");
+    const bingoResult = document.getElementById("bingoResult");
+    const bingoButton = document.getElementById("bingoButton");
+    const welcomeMessage = document.querySelector("h1");
+
+    gameArea.classList.remove("active");
+    wheelArea.classList.remove("active");
+    diceArea.classList.remove("active");
+    balloonArea.classList.remove("active");
+    slotArea.classList.remove("active");
+    penaltyArea.classList.remove("active");
+    bingoArea.classList.remove("active");
+    multiplier.style.display = "none";
+    betAmount.style.display = "none";
+    betButton.style.display = "none";
+    cashOutBtn.style.display = "none";
+    wheelResult.style.display = "none";
+    wheelButton.style.display = "none";
+    diceResult.style.display = "none";
+    diceButton.style.display = "none";
+    balloonMultiplier.style.display = "none";
+    balloonBetAmount.style.display = "none";
+    balloonBetButton.style.display = "none";
+    balloonCashOutBtn.style.display = "none";
+    slotResult.style.display = "none";
+    slotButton.style.display = "none";
+    penaltyResult.style.display = "none";
+    penaltyButton.style.display = "none";
+    bingoResult.style.display = "none";
+    bingoButton.style.display = "none";
+    welcomeMessage.style.display = "none";
+
+    if (game === "aviator") {
+      gameArea.classList.add("active");
+      multiplier.style.display = "block";
+      betAmount.style.display = "block";
+      betButton.style.display = "block";
+      cashOutBtn.style.display = "block";
+    } else if (game === "wheel") {
+      wheelArea.classList.add("active");
+      wheelResult.style.display = "block";
+      wheelButton.style.display = "block";
+    } else if (game === "dice") {
+      diceArea.classList.add("active");
+      diceResult.style.display = "block";
+      diceButton.style.display = "block";
+    } else if (game === "balloon") {
+      balloonArea.classList.add("active");
+      balloonMultiplier.style.display = "block";
+      balloonBetAmount.style.display = "block";
+      balloonBetButton.style.display = "block";
+      balloonCashOutBtn.style.display = "block";
+    } else if (game === "slot") {
+      slotArea.classList.add("active");
+      slotResult.style.display = "block";
+      slotButton.style.display = "block";
+    } else if (game === "penalty") {
+      penaltyArea.classList.add("active");
+      penaltyResult.style.display = "block";
+      penaltyButton.style.display = "block";
+    } else if (game === "bingo") {
+      bingoArea.classList.add("active");
+      bingoResult.style.display = "block";
+      bingoButton.style.display = "block";
+      resetBingoGame();
+    }
+
+    document.getElementById("categories").style.display = "none";
+  };
+
+  function updateAuthUI(user) {
+    const authButtons = document.getElementById("authButtons");
+    const authForm = document.getElementById("authForm");
+    const logoutButton = document.querySelector(".logout-button");
+    authButtons.innerHTML = "";
+
+    if (user) {
+      const logoutFormButton = document.createElement("button");
+      logoutFormButton.innerText = "Çıkış Yap";
+      logoutFormButton.onclick = logout;
+      authButtons.appendChild(logoutFormButton);
+      authForm.style.display = "none";
+      logoutButton.classList.remove("hidden");
+    } else {
+      const registerButton = document.createElement("button");
+      registerButton.innerText = "Kayıt Ol";
+      registerButton.onclick = register;
+      authButtons.appendChild(registerButton);
+
+      const loginButton = document.createElement("button");
+      loginButton.innerText = "Giriş Yap";
+      loginButton.onclick = login;
+      authButtons.appendChild(loginButton);
+      authForm.style.display = "block";
+      logoutButton.classList.add("hidden");
+    }
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    const userInfo = document.getElementById("userInfo");
+    const balance = document.getElementById("balance");
+    if (user) {
+      currentUser = user;
+      userInfo.innerText = `Hoşgeldin: ${user.email}`;
+      loadBalance();
+    } else {
+      currentUser = null;
+      userInfo.innerText = "Henüz giriş yapılmadı.";
+      balance.innerText = "0";
+    }
+    updateAuthUI(user);
+  });
+
+  window.register = function() {
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    const result = document.getElementById("result");
+
+    if (!email || !pass) {
+      result.innerText = "Lütfen email ve şifre alanlarını doldurun.";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then((userCredential) => {
+        const uid = userCredential.user.uid;
+        set(ref(db, 'users/' + uid), { balance: 0 })
+          .then(() => {
+            result.innerText = "Kayıt başarılı! Giriş yapabilirsiniz.";
+            result.style.color = "#2e7d32";
+          })
+          .catch((error) => {
+            result.innerText = `Veritabanı hatası: ${error.message}`;
+            result.style.color = "#d32f2f";
+            console.error("Kayıt veritabanı hatası:", error);
+          });
+      })
+      .catch((error) => {
+        if (error.code === "auth/email-already-in-use") {
+          result.innerText = "Bu email zaten kayıtlı. Lütfen giriş yapmayı deneyin.";
+        } else if (error.code === "auth/invalid-email") {
+          result.innerText = "Geçersiz email adresi.";
+        } else if (error.code === "auth/weak-password") {
+          result.innerText = "Şifre en az 6 karakter olmalı.";
+        } else {
+          result.innerText = `Kayıt hatası: ${error.message}`;
+        }
+        result.style.color = "#d32f2f";
+        console.error("Kayıt hatası:", error);
+      });
+  };
+
+  window.login = function() {
+    const email = document.getElementById("email").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    const result = document.getElementById("result");
+
+    if (!email || !pass) {
+      result.innerText = "Lütfen email ve şifre alanlarını doldurun.";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, pass)
+      .then(() => {
+        result.innerText = "Giriş başarılı!";
+        result.style.color = "#2e7d32";
+      })
+      .catch((error) => {
+        console.error("Giriş hatası:", error);
+        if (error.code === "auth/wrong-password") {
+          result.innerText = "Yanlış şifre.";
+        } else if (error.code === "auth/user-not-found") {
+          result.innerText = "Bu email ile kayıtlı kullanıcı bulunamadı.";
+        } else if (error.code === "auth/invalid-email") {
+          result.innerText = "Geçersiz email adresi.";
+        } else if (error.code === "auth/too-many-requests") {
+          result.innerText = "Çok fazla giriş denemesi. Lütfen bir süre bekleyin.";
+        } else {
+          result.innerText = `Giriş hatası: ${error.message}`;
+        }
+        result.style.color = "#d32f2f";
+      });
+  };
+
+  window.logout = function() {
+    signOut(auth)
+      .then(() => {
+        document.getElementById("result").innerText = "Çıkış yapıldı.";
+        document.getElementById("result").style.color = "#2e7d32";
+      })
+      .catch((error) => {
+        document.getElementById("result").innerText = `Çıkış hatası: ${error.message}`;
+        document.getElementById("result").style.color = "#d32f2f";
+        console.error("Çıkış hatası:", error);
+      });
+  };
+
+  function loadBalance() {
+    if (!currentUser) return;
+    const balanceRef = ref(db, 'users/' + currentUser.uid + '/balance');
+    onValue(balanceRef, (snapshot) => {
+      document.getElementById("balance").innerText = (snapshot.val() || 0).toFixed(2);
+    }, (error) => {
+      console.error("Bakiye yükleme hatası:", error);
+      document.getElementById("result").innerText = `Bakiye yükleme hatası: ${error.message}`;
+      document.getElementById("result").style.color = "#d32f2f";
+    });
+  }
+
+  const validCodes = {
+    "KOD10": 10,
+    "KOD20": 20,
+    "KOD100": 100
+  };
+
+  window.useCode = function() {
+    const code = document.getElementById("codeInput").value.trim().toUpperCase();
+    const result = document.getElementById("result");
+
+    if (!currentUser) {
+      result.innerText = "Önce giriş yapmalısınız.";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    if (!code) {
+      result.innerText = "Lütfen bir kod girin.";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    const amount = validCodes[code];
+    if (!amount) {
+      result.innerText = "Geçersiz kod!";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    const usedCodesRef = ref(db, 'users/' + currentUser.uid + '/usedCodes');
+    get(usedCodesRef).then((snapshot) => {
+      const usedCodes = snapshot.val() || {};
+      if (usedCodes[code]) {
+        result.innerText = "Bu kod daha önce kullanıldı!";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+      get(userRef).then((snapshot) => {
+        const current = snapshot.val() || 0;
+        set(userRef, current + amount)
+          .then(() => {
+            set(ref(db, 'users/' + currentUser.uid + '/usedCodes/' + code), true)
+              .then(() => {
+                result.innerText = `+${amount} TL eklendi!`;
+                result.style.color = "#2e7d32";
+              })
+              .catch((error) => {
+                result.innerText = `Hata: Kod kaydedilemedi - ${error.message}`;
+                result.style.color = "#d32f2f";
+                console.error("Kod kaydetme hatası:", error);
+              });
+          })
+          .catch((error) => {
+            result.innerText = `Hata: Bakiye güncellenemedi - ${error.message}`;
+            result.style.color = "#d32f2f";
+            console.error("Bakiye güncelleme hatası:", error);
+          });
+      }).catch((error) => {
+        result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bakiye okuma hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Kullanılan kodlar kontrol edilemedi - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Kullanılan kodlar kontrol hatası:", error);
+    });
+
+    document.getElementById("codeInput").value = "";
+  };
+
+  window.startGame = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    const betAmount = parseFloat(document.getElementById("betAmount").value);
+    const result = document.getElementById("result");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    if (isNaN(betAmount) || betAmount < 2) {
+      result.innerText = "Lütfen en az 2 TL bahis girin.";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      if (betAmount > currentBalance) {
+        result.innerText = "Yetersiz bakiye!";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      set(userRef, currentBalance - betAmount).then(() => {
+        gameRunning = true;
+        currentMultiplier = 1;
+        document.getElementById("multiplier").innerText = `Çarpan: ${currentMultiplier.toFixed(2)}x`;
+        document.getElementById("cashOutBtn").disabled = false;
+        document.getElementById("betAmount").disabled = true;
+        document.getElementById("plane").style.transform = `translateX(-50%) translateY(-${currentMultiplier * 10}px)`;
+
+        const crashPoint = Math.min(Math.random() * 8.9 + 1.1, 10);
+        gameInterval = setInterval(() => {
+          if (!gameRunning) return;
+          currentMultiplier += 0.1;
+          document.getElementById("multiplier").innerText = `Çarpan: ${currentMultiplier.toFixed(2)}x`;
+          document.getElementById("plane").style.transform = `translateX(-50%) translateY(-${currentMultiplier * 10}px)`;
+
+          if (currentMultiplier >= crashPoint || currentMultiplier >= 10) {
+            gameRunning = false;
+            clearInterval(gameInterval);
+            document.getElementById("cashOutBtn").disabled = true;
+            document.getElementById("betAmount").disabled = false;
+            document.getElementById("plane").style.display = "none";
+
+            if (currentMultiplier >= 10) {
+              const winnings = betAmount * currentMultiplier;
+              set(userRef, currentBalance - betAmount + winnings).then(() => {
+                result.innerText = `Maksimum çarpana ulaştın! ${winnings.toFixed(2)} TL kazandın!`;
+                result.style.color = "#2e7d32";
+              }).catch((error) => {
+                result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+                result.style.color = "#d32f2f";
+                console.error("Kazanç ekleme hatası:", error);
+              });
+            } else {
+              result.innerText = "Uçak düştü! Bahis kaybedildi.";
+              result.style.color = "#d32f2f";
+            }
+
+            setTimeout(() => {
+              document.getElementById("plane").style.display = "block";
+              document.getElementById("plane").style.transform = "translateX(-50%)";
+            }, 1000);
+          }
+        }, 100);
+      }).catch((error) => {
+        result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bahis hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.cashOut = function() {
+    if (!gameRunning) return;
+    gameRunning = false;
+    clearInterval(gameInterval);
+    const betAmount = parseFloat(document.getElementById("betAmount").value);
+    const result = document.getElementById("result");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      const winnings = betAmount * currentMultiplier;
+      set(userRef, currentBalance + winnings).then(() => {
+        result.innerText = `Kazandın! ${winnings.toFixed(2)} TL eklendi.`;
+        result.style.color = "#2e7d32";
+        document.getElementById("cashOutBtn").disabled = true;
+        document.getElementById("betAmount").disabled = false;
+        document.getElementById("plane").style.display = "none";
+        setTimeout(() => {
+          document.getElementById("plane").style.display = "block";
+          document.getElementById("plane").style.transform = "translateX(-50%)";
+        }, 1000);
+      }).catch((error) => {
+        result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Kazanç ekleme hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.startWheel = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    if (wheelSpinning) {
+      document.getElementById("result").innerText = "Çark zaten dönüyor!";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    const betAmount = 5;
+    const result = document.getElementById("result");
+    const wheelResult = document.getElementById("wheelResult");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      if (betAmount > currentBalance) {
+        result.innerText = "Yetersiz bakiye! En az 5 TL gerekli.";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      set(userRef, currentBalance - betAmount).then(() => {
+        wheelSpinning = true;
+        const wheel = document.getElementById("wheel");
+        const wheelButton = document.getElementById("wheelButton");
+        wheelButton.disabled = true;
+        wheel.classList.add("spinning");
+        wheelResult.innerText = "Çark dönüyor...";
+
+        const rewards = [0, 5, 10, 20, 0];
+        const randomIndex = Math.floor(Math.random() * rewards.length);
+        const reward = rewards[randomIndex];
+
+        setTimeout(() => {
+          wheelSpinning = false;
+          wheel.classList.remove("spinning");
+          wheelButton.disabled = false;
+
+          if (reward === 0) {
+            wheelResult.innerText = "Üzgünüm, ödül kazanamadın!";
+            result.innerText = "5 TL kaybettin.";
+            result.style.color = "#d32f2f";
+          } else {
+            set(userRef, currentBalance - betAmount + reward).then(() => {
+              wheelResult.innerText = `Tebrikler! ${reward} TL kazandın!`;
+              result.innerText = `+${reward} TL eklendi!`;
+              result.style.color = "#2e7d32";
+            }).catch((error) => {
+              result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+              result.style.color = "#d32f2f";
+              console.error("Kazanç ekleme hatası:", error);
+            });
+          }
+        }, 3000);
+      }).catch((error) => {
+        result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bahis hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      document.getElementById("result").style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.rollDice = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    if (diceRolling) {
+      document.getElementById("result").innerText = "Zarlar zaten atılıyor!";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    const betAmount = 5;
+    const result = document.getElementById("result");
+    const diceResult = document.getElementById("diceResult");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      if (betAmount > currentBalance) {
+        result.innerText = "Yetersiz bakiye! En az 5 TL gerekli.";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      set(userRef, currentBalance - betAmount).then(() => {
+        diceRolling = true;
+        const diceButton = document.getElementById("diceButton");
+        const die1 = document.getElementById("die1");
+        const die2 = document.getElementById("die2");
+        diceButton.disabled = true;
+        die1.classList.add("rolling");
+        die2.classList.add("rolling");
+        diceResult.innerText = "Zarlar atılıyor...";
+
+        let rollCount = 0;
+        const rollInterval = setInterval(() => {
+          die1.innerText = Math.floor(Math.random() * 6) + 1;
+          die2.innerText = Math.floor(Math.random() * 6) + 1;
+          rollCount++;
+          if (rollCount >= 10) {
+            clearInterval(rollInterval);
+            const finalDie1 = Math.floor(Math.random() * 6) + 1;
+            const finalDie2 = Math.floor(Math.random() * 6) + 1;
+            die1.innerText = finalDie1;
+            die2.innerText = finalDie2;
+            die1.classList.remove("rolling");
+            die2.classList.remove("rolling");
+
+            const sum = finalDie1 + finalDie2;
+            if (sum === 7 || sum === 11) {
+              set(userRef, currentBalance - betAmount + 10).then(() => {
+                diceResult.innerText = `Tebrikler! ${sum} attın, 10 TL kazandın!`;
+                result.innerText = `+10 TL eklendi!`;
+                result.style.color = "#2e7d32";
+              }).catch((error) => {
+                result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+                result.style.color = "#d32f2f";
+                console.error("Kazanç ekleme hatası:", error);
+              });
+            } else if (sum === 2 || sum === 3 || sum === 12) {
+              diceResult.innerText = `Üzgünüm, ${sum} attın, kaybettin!`;
+              result.innerText = "5 TL kaybettin.";
+              result.style.color = "#d32f2f";
+            } else {
+              diceResult.innerText = `${sum} attın, tekrar atabilirsin!`;
+              result.innerText = "";
+            }
+
+            diceRolling = false;
+            diceButton.disabled = false;
+          }
+        }, 100);
+      }).catch((error) => {
+        result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bahis hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.startBalloonGame = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    const betAmount = parseFloat(document.getElementById("balloonBetAmount").value);
+    const result = document.getElementById("result");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    if (isNaN(betAmount) || betAmount < 2) {
+      result.innerText = "Lütfen en az 2 TL bahis girin.";
+      result.style.color = "#d32f2f";
+      return;
+    }
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      if (betAmount > currentBalance) {
+        result.innerText = "Yetersiz bakiye!";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      set(userRef, currentBalance - betAmount).then(() => {
+        balloonGameRunning = true;
+        currentBalloonMultiplier = 1;
+        document.getElementById("balloonMultiplier").innerText = `Çarpan: ${currentBalloonMultiplier.toFixed(2)}x`;
+        document.getElementById("balloonCashOutBtn").disabled = false;
+        document.getElementById("balloonBetAmount").disabled = true;
+        document.getElementById("balloon").innerText = "🎈";
+        document.getElementById("balloon").style.transform = `translateX(-50%) translateY(-${currentBalloonMultiplier * 5}px)`;
+        document.getElementById("balloon").classList.remove("popped");
+        riseSound.play();
+
+        const crashPoint = Math.random() * 18.9 + 1.1;
+        balloonInterval = setInterval(() => {
+          if (!balloonGameRunning) return;
+          currentBalloonMultiplier += 0.1;
+          document.getElementById("balloonMultiplier").innerText = `Çarpan: ${currentBalloonMultiplier.toFixed(2)}x`;
+          document.getElementById("balloon").style.transform = `translateX(-50%) translateY(-${currentBalloonMultiplier * 5}px)`;
+
+          if (currentBalloonMultiplier >= crashPoint) {
+            balloonGameRunning = false;
+            clearInterval(balloonInterval);
+            riseSound.pause();
+            popSound.play();
+            document.getElementById("balloonCashOutBtn").disabled = true;
+            document.getElementById("balloonBetAmount").disabled = false;
+            document.getElementById("balloon").innerText = "💥";
+            document.getElementById("balloon").classList.add("popped");
+            result.innerText = "Balon patladı! Bahis kaybedildi.";
+            result.style.color = "#d32f2f";
+            setTimeout(() => {
+              document.getElementById("balloon").classList.remove("popped");
+              document.getElementById("balloon").innerText = "🎈";
+              document.getElementById("balloon").style.transform = "translateX(-50%)";
+            }, 1000);
+          }
+        }, 100);
+      }).catch((error) => {
+        result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bahis hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.cashOutBalloon = function() {
+    if (!balloonGameRunning) return;
+    balloonGameRunning = false;
+    clearInterval(balloonInterval);
+    riseSound.pause();
+    popSound.play();
+    const betAmount = parseFloat(document.getElementById("balloonBetAmount").value);
+    const result = document.getElementById("result");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      const winnings = betAmount * currentBalloonMultiplier;
+      set(userRef, currentBalance + winnings).then(() => {
+        result.innerText = `Kazandın! ${winnings.toFixed(2)} TL eklendi.`;
+        result.style.color = "#2e7d32";
+        document.getElementById("balloonCashOutBtn").disabled = true;
+        document.getElementById("balloonBetAmount").disabled = false;
+        document.getElementById("balloon").innerText = "💥";
+        document.getElementById("balloon").classList.add("popped");
+        setTimeout(() => {
+          document.getElementById("balloon").classList.remove("popped");
+          document.getElementById("balloon").innerText = "🎈";
+          document.getElementById("balloon").style.transform = "translateX(-50%)";
+        }, 1000);
+      }).catch((error) => {
+        result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Kazanç ekleme hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.spinSlot = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    if (slotSpinning) {
+      document.getElementById("result").innerText = "Slot zaten dönüyor!";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    const betAmount = 5;
+    const result = document.getElementById("result");
+    const slotResult = document.getElementById("slotResult");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      if (betAmount > currentBalance) {
+        result.innerText = "Yetersiz bakiye! En az 5 TL gerekli.";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      set(userRef, currentBalance - betAmount).then(() => {
+        slotSpinning = true;
+        const slotButton = document.getElementById("slotButton");
+        const reel1 = document.getElementById("reel1");
+        const reel2 = document.getElementById("reel2");
+        const reel3 = document.getElementById("reel3");
+        slotButton.disabled = true;
+        reel1.classList.add("spinning");
+        reel2.classList.add("spinning");
+        reel3.classList.add("spinning");
+        slotResult.innerText = "Slot dönüyor...";
+
+        const symbols = ["🍒", "🍋", "🍊", "🍇", "🔔"];
+        let spinCount = 0;
+
+        const spinInterval = setInterval(() => {
+          reel1.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+          reel2.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+          reel3.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+          spinCount++;
+          if (spinCount >= 10) {
+            clearInterval(spinInterval);
+            const finalReel1 = symbols[Math.floor(Math.random() * symbols.length)];
+            const finalReel2 = symbols[Math.floor(Math.random() * symbols.length)];
+            const finalReel3 = symbols[Math.floor(Math.random() * symbols.length)];
+            reel1.innerText = finalReel1;
+            reel2.innerText = finalReel2;
+            reel3.innerText = finalReel3;
+            reel1.classList.remove("spinning");
+            reel2.classList.remove("spinning");
+            reel3.classList.remove("spinning");
+
+            let reward = 0;
+            if (finalReel1 === finalReel2 && finalReel2 === finalReel3) {
+              reward = 20;
+            } else if (finalReel1 === finalReel2 || finalReel2 === finalReel3 || finalReel1 === finalReel3) {
+              reward = 5;
+            }
+
+            if (reward === 0) {
+              slotResult.innerText = "Üzgünüm, ödül kazanamadın!";
+              result.innerText = "5 TL kaybettin.";
+              result.style.color = "#d32f2f";
+            } else {
+              set(userRef, currentBalance - betAmount + reward).then(() => {
+                slotResult.innerText = `Tebrikler! ${reward} TL kazandın!`;
+                result.innerText = `+${reward} TL eklendi!`;
+                result.style.color = "#2e7d32";
+              }).catch((error) => {
+                result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+                result.style.color = "#d32f2f";
+                console.error("Kazanç ekleme hatası:", error);
+              });
+            }
+
+            slotSpinning = false;
+            slotButton.disabled = false;
+          }
+        }, 100);
+      }).catch((error) => {
+        result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bahis hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  window.shootPenalty = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    if (penaltyShooting) {
+      document.getElementById("result").innerText = "Penaltı zaten atılıyor!";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    const betAmount = 5;
+    const result = document.getElementById("result");
+    const penaltyResult = document.getElementById("penaltyResult");
+    const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+    get(userRef).then((snapshot) => {
+      const currentBalance = snapshot.val() || 0;
+      if (betAmount > currentBalance) {
+        result.innerText = "Yetersiz bakiye! En az 5 TL gerekli.";
+        result.style.color = "#d32f2f";
+        return;
+      }
+
+      set(userRef, currentBalance - betAmount).then(() => {
+        penaltyShooting = true;
+        const penaltyButton = document.getElementById("penaltyButton");
+        const ball = document.getElementById("ball");
+        penaltyButton.disabled = true;
+        penaltyResult.innerText = "Penaltı atılıyor...";
+
+        ball.classList.add("shooting");
+        const isGoal = Math.random() < 0.7;
+
+        setTimeout(() => {
+          if (isGoal) {
+            set(userRef, currentBalance - betAmount + 10).then(() => {
+              penaltyResult.innerText = "GOL! 10 TL kazandın!";
+              result.innerText = `+10 TL eklendi!`;
+              result.style.color = "#2e7d32";
+            }).catch((error) => {
+              result.innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+              result.style.color = "#d32f2f";
+              console.error("Kazanç ekleme hatası:", error);
+            });
+          } else {
+            ball.classList.add("missed");
+            penaltyResult.innerText = "Kaçtı! Penaltı gol olmadı.";
+            result.innerText = "5 TL kaybettin.";
+            result.style.color = "#d32f2f";
+          }
+
+          setTimeout(() => {
+            ball.classList.remove("shooting", "missed");
+            ball.style.transform = "translateX(-50%)";
+            penaltyShooting = false;
+            penaltyButton.disabled = false;
+          }, 500);
+        }, 500);
+      }).catch((error) => {
+        result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bahis hatası:", error);
+      });
+    }).catch((error) => {
+      result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+      result.style.color = "#d32f2f";
+      console.error("Bakiye okuma hatası:", error);
+    });
+  };
+
+  function resetBingoGame() {
+    bingoPlaying = false;
+    bingoNumbers = [];
+    bingoCard = [];
+    const bingoCardElement = document.getElementById("bingoCard");
+    const bingoDrawnNumbers = document.getElementById("bingoDrawnNumbers");
+    const bingoResult = document.getElementById("bingoResult");
+    const bingoButton = document.getElementById("bingoButton");
+
+    bingoCardElement.innerHTML = "";
+    bingoDrawnNumbers.innerText = "Çekilen numaralar: -";
+    bingoResult.innerText = "Numara çekmek için 5 TL bahis yap!";
+    bingoButton.disabled = false;
+
+    const numbers = Array.from({ length: 75 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+    let numberIndex = 0;
+    for (let i = 0; i < 5; i++) {
+      const row = [];
+      for (let j = 0; j < 5; j++) {
+        if (i === 2 && j === 2) {
+          row.push(0);
+        } else {
+          row.push(numbers[numberIndex++]);
+        }
+      }
+      bingoCard.push(row);
+    }
+
+    bingoCard.forEach((row, rowIndex) => {
+      row.forEach((num, colIndex) => {
+        const cell = document.createElement("div");
+        cell.classList.add("bingo-cell");
+        cell.dataset.row = rowIndex;
+        cell.dataset.col = colIndex;
+        cell.innerText = num === 0 ? "★" : num;
+        if (num === 0) cell.classList.add("marked");
+        bingoCardElement.appendChild(cell);
+      });
+    });
+  }
+
+  function checkBingoWin() {
+    for (let i = 0; i < 5; i++) {
+      if (bingoCard[i].every(num => num === 0 || bingoNumbers.includes(num))) {
+        return true;
+      }
+      if (bingoCard.every(row => row[i] === 0 || bingoNumbers.includes(row[i]))) {
+        return true;
+      }
+    }
+    if (bingoCard.every((row, i) => row[i] === 0 || bingoNumbers.includes(row[i]))) {
+      return true;
+    }
+    if (bingoCard.every((row, i) => row[4 - i] === 0 || bingoNumbers.includes(row[4 - i]))) {
+      return true;
+    }
+    return false;
+  }
+
+  window.playBingo = function() {
+    if (!currentUser) {
+      document.getElementById("result").innerText = "Önce giriş yapmalısınız.";
+      document.getElementById("result").style.color = "#d32f2f";
+      return;
+    }
+
+    if (bingoPlaying) {
+      const remainingNumbers = Array.from({ length: 75 }, (_, i) => i + 1).filter(n => !bingoNumbers.includes(n));
+      if (remainingNumbers.length === 0) {
+        document.getElementById("bingoResult").innerText = "Tüm numaralar çekildi!";
+        document.getElementById("bingoButton").disabled = true;
+        return;
+      }
+
+      const newNumber = remainingNumbers[Math.floor(Math.random() * remainingNumbers.length)];
+      bingoNumbers.push(newNumber);
+      document.getElementById("bingoDrawnNumbers").innerText = `Çekilen numaralar: ${bingoNumbers.join(", ")}`;
+
+      bingoCard.forEach((row, rowIndex) => {
+        row.forEach((num, colIndex) => {
+          if (num === newNumber) {
+            const cell = document.querySelector(`.bingo-cell[data-row="${rowIndex}"][data-col="${colIndex}"]`);
+            cell.classList.add("marked");
+          }
+        });
+      });
+
+      if (checkBingoWin()) {
+        bingoPlaying = false;
+        const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+        get(userRef).then((snapshot) => {
+          const currentBalance = snapshot.val() || 0;
+          set(userRef, currentBalance + 10).then(() => {
+            document.getElementById("bingoResult").innerText = "TOMBALA! 10 TL kazandın!";
+            document.getElementById("result").innerText = `+10 TL eklendi!`;
+            document.getElementById("result").style.color = "#2e7d32";
+            document.getElementById("bingoButton").disabled = true;
+          }).catch((error) => {
+            document.getElementById("result").innerText = `Hata: Kazanç eklenemedi - ${error.message}`;
+            document.getElementById("result").style.color = "#d32f2f";
+            console.error("Kazanç ekleme hatası:", error);
+          });
+        }).catch((error) => {
+          document.getElementById("result").innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+          document.getElementById("result").style.color = "#d32f2f";
+          console.error("Bakiye okuma hatası:", error);
+        });
+      } else {
+        document.getElementById("bingoResult").innerText = `Numara çekildi: ${newNumber}`;
+      }
+    } else {
+      const betAmount = 5;
+      const result = document.getElementById("result");
+      const bingoResult = document.getElementById("bingoResult");
+      const userRef = ref(db, 'users/' + currentUser.uid + '/balance');
+
+      get(userRef).then((snapshot) => {
+        const currentBalance = snapshot.val() || 0;
+        if (betAmount > currentBalance) {
+          result.innerText = "Yetersiz bakiye! En az 5 TL gerekli.";
+          result.style.color = "#d32f2f";
+          return;
+        }
+
+        set(userRef, currentBalance - betAmount).then(() => {
+          bingoPlaying = true;
+          resetBingoGame();
+          bingoResult.innerText = "Numara çekmek için butona tıkla!";
+          const newNumber = Math.floor(Math.random() * 75) + 1;
+          bingoNumbers = [newNumber];
+          document.getElementById("bingoDrawnNumbers").innerText = `Çekilen numaralar: ${newNumber}`;
+
+          bingoCard.forEach((row, rowIndex) => {
+            row.forEach((num, colIndex) => {
+              if (num === newNumber) {
+                const cell = document.querySelector(`.bingo-cell[data-row="${rowIndex}"][data-col="${colIndex}"]`);
+                cell.classList.add("marked");
+              }
+            });
+          });
+
+          bingoResult.innerText = `Numara çekildi: ${newNumber}`;
+        }).catch((error) => {
+          result.innerText = `Hata: Bahis alınamadı - ${error.message}`;
+          result.style.color = "#d32f2f";
+          console.error("Bahis hatası:", error);
+        });
+      }).catch((error) => {
+        result.innerText = `Hata: Bakiye okunamadı - ${error.message}`;
+        result.style.color = "#d32f2f";
+        console.error("Bakiye okuma hatası:", error);
+      });
+    }
+  };
+</script>
+</body>
+</html>
